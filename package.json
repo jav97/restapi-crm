@@ -1,0 +1,25 @@
+{
+  "name": "crm",
+  "version": "1.0.0",
+  "description": "maintenance structure",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"welcome\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jav97/restapi-crm.git"
+  },
+  "author": "Hector",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.28",
+    "nodejs-base64": "^1.0.3",
+    "nodemon": "^2.0.4"
+  }
+}
