@@ -4,7 +4,7 @@
   "description": "maintenance structure",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"welcome\""
+    "dev": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",

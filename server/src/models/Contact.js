@@ -4,8 +4,8 @@ const Client = require('./Client');
 const ContactSchema=new Schema({
 
     client:{
-        type:Client,
-        required:true
+        type: Client.schema,
+        require:true
     },
     name:{
         type:String,

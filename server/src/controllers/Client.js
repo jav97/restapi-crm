@@ -1,6 +1,39 @@
 const ClientController = {};
 const Client = require('../models/Client');
 
+
+ClientController.clientPost = (req, res) => {
+    var client = new Client();
+  
+    client.firstname = req.body.firstname;
+    client.lastname = req.body.lastname;
+    client.email = req.body.email;
+    client.address = req.body.address;
+  
+    if (client.firstname && client.lastname &&  client.email && client.address ) {
+      client.save(function (err) {
+        if (err) {
+          res.status(422);
+          console.log('error while saving the student', err)
+          res.json({
+            error: 'There was an error saving the student'
+          });
+        }
+        res.status(201);//CREATED
+        res.header({
+          'location': `http://localhost:4000/api/clients/?id=${client.id}`
+        });
+        res.json(client);
+      });
+    } else {
+      res.status(422);
+      console.log('error while saving the student')
+      res.json({
+        error: 'No valid data provided for student'
+      });
+    }
+  };
+
 //get all clients
 ClientController.getClients = async (req, res) => {
     const clients = await Client.find();

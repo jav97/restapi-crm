@@ -1,6 +1,38 @@
 const SupportTicketController = {};
 const SupportTicket = require('../models/SupportTicket');
 
+SupportTicketController.supportTicketPost = (req, res) => {
+    var supportTicket = new SupportTicket();
+  
+    supportTicket.firstname = req.body.firstname;
+    supportTicket.lastname = req.body.lastname;
+    supportTicket.email = req.body.email;
+    supportTicket.address = req.body.address;
+  
+    if (supportTicket.firstname && supportTicket.lastname &&  supportTicket.email && supportTicket.address ) {
+      supportTicket.save(function (err) {
+        if (err) {
+          res.status(422);
+          console.log('error while saving the student', err)
+          res.json({
+            error: 'There was an error saving the student'
+          });
+        }
+        res.status(201);//CREATED
+        res.header({
+          'location': `http://localhost:4000/api/supportTickets/?id=${supportTicket.id}`
+        });
+        res.json(supportTicket);
+      });
+    } else {
+      res.status(422);
+      console.log('error while saving the student')
+      res.json({
+        error: 'No valid data provided for student'
+      });
+    }
+  };
+
 //get all contacts
 SupportTicketController.getSupportTicket = async (req, res) => {
     const supportTickets = await SupportTicket.find();
