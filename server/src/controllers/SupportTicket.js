@@ -1,15 +1,18 @@
 const SupportTicketController = {};
 const SupportTicket = require('../models/SupportTicket');
+const Client = require('../models/Client');
 
-SupportTicketController.supportTicketPost = (req, res) => {
+SupportTicketController.postSupportTicket = async(req, res) => {
     var supportTicket = new SupportTicket();
   
-    supportTicket.firstname = req.body.firstname;
-    supportTicket.lastname = req.body.lastname;
-    supportTicket.email = req.body.email;
-    supportTicket.address = req.body.address;
+    supportTicket.titleProblem = req.body.titleProblem;
+    supportTicket.detailProblem = req.body.detailProblem;
+    supportTicket.whoReportProblem = req.body.whoReportProblem;
+    const client = await Client.findById(req.body.client);
+    supportTicket.client = client;
+    supportTicket.state = req.body.state;
   
-    if (supportTicket.firstname && supportTicket.lastname &&  supportTicket.email && supportTicket.address ) {
+    if (supportTicket.titleProblem && supportTicket.detailProblem &&  supportTicket.whoReportProblem && supportTicket.client && supportTicket.state) {
       supportTicket.save(function (err) {
         if (err) {
           res.status(422);
@@ -34,8 +37,8 @@ SupportTicketController.supportTicketPost = (req, res) => {
   };
 
 //get all contacts
-SupportTicketController.getSupportTicket = async (req, res) => {
-    const supportTickets = await SupportTicket.find();
+SupportTicketController.getSupportTickets = async (req, res) => {
+    const supportTickets = await SupportTicket.find().populate('Client');
     res.status(200).json(supportTickets);
 }
 
@@ -62,8 +65,8 @@ SupportTicketController.deleteSupportTicket = async (req, res) => {
 //update date of some contact
 SupportTicketController.updateSupportTicket = async (req, res) => {
       try {
-        const {name,legalCertificate,webSite,address, numberPhone, sector}=req.body;
-        await SupportTicket.findByIdAndUpdate(req.params.id,{name,legalCertificate,webSite,address, numberPhone, sector});
+        const {titleProblem,detailProblem,whoReportProblem,state, client}=req.body;
+        await SupportTicket.findByIdAndUpdate(req.params.id,{titleProblem,detailProblem,whoReportProblem,state, client});
         res.status(400).json('Support Ticket updated');
       } catch (error) {
            res.json(error);

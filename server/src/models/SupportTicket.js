@@ -14,10 +14,10 @@ const SupportTicketSchema=new Schema({
          type:String,
          required:true,
      },
-     client:{
-          type:Client,
-          required:true
-     },
+     client : { 
+        type : Schema.Types.Array, 
+        ref : 'client' 
+    },
      state:{
           type:String,
           required:true,

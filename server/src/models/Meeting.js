@@ -8,21 +8,25 @@ const MeetingSchema=new Schema({
         required:true
     },
     date:{
-        type:Date,
+        type:String,
         required:true
     },
-     user:{
-         type:User,
-         required:true,
-     },
+    hour:{
+        type:String,
+        required:true
+    },
+    user : { 
+        type : Schema.Types.Array, 
+        ref : 'user' 
+    },
      isVirtual:{
-          boolean:false,
+          type:Boolean,
           required:true
      },
-     client:{
-          type:Client,
-          required:true,
-     },
+     client : { 
+        type : Schema.Types.Array, 
+        ref : 'client' 
+    },
 });
 
 module.exports=model('Meeting',MeetingSchema);

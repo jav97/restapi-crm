@@ -1,21 +1,27 @@
 const MeetingController = {};
 const Meeting = require('../models/Meeting');
+const Client = require('../models/Client');
+const User = require('../models/User');
 
-MeetingController.meetingPost = (req, res) => {
+MeetingController.postMeeting = async(req, res) => {
     var meeting = new Meeting();
+
+    meeting.title = req.body.title;
+    meeting.date = req.body.date;
+    meeting.hour = req.body.hour;
+    const user = await User.findById(req.body.user);
+    meeting.user = user;
+    meeting.isVirtual = req.body.isVirtual;
+    const client = await Client.findById(req.body.client);
+    meeting.client = client;
   
-    meeting.firstname = req.body.firstname;
-    meeting.lastname = req.body.lastname;
-    meeting.email = req.body.email;
-    meeting.address = req.body.address;
-  
-    if (meeting.firstname && meeting.lastname &&  meeting.email && meeting.address ) {
+    if (meeting.title && meeting.date &&  meeting.hour && meeting.user && meeting.isVirtual && meeting.client ) {
       meeting.save(function (err) {
         if (err) {
           res.status(422);
-          console.log('error while saving the student', err)
+          console.log('error while saving the meeting', err)
           res.json({
-            error: 'There was an error saving the student'
+            error: 'There was an error saving the meeting'
           });
         }
         res.status(201);//CREATED
@@ -26,9 +32,9 @@ MeetingController.meetingPost = (req, res) => {
       });
     } else {
       res.status(422);
-      console.log('error while saving the student')
+      console.log('error while saving the meeting')
       res.json({
-        error: 'No valid data provided for student'
+        error: 'No valid data provided for meeting'
       });
     }
   };
@@ -36,7 +42,7 @@ MeetingController.meetingPost = (req, res) => {
 
 //get all meetings
 MeetingController.getMeetings = async (req, res) => {
-    const meetings = await Meeting.find();
+    const meetings = await Meeting.find().populate('Client','User');
     res.status(200).json(meetings);
 }
 

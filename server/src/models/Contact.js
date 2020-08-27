@@ -1,12 +1,11 @@
 const {Schema,model}=require('mongoose');
-const Client = require('./Client');
 
 const ContactSchema=new Schema({
 
-    client:{
-        type: Client.schema,
-        require:true
-    },
+    client : { 
+        type : Schema.Types.Array, 
+        ref : 'client' 
+    },    
     name:{
         type:String,
         required:true

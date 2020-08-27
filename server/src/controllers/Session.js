@@ -1,4 +1,5 @@
 const SessionController={};
+const config = require('../config');
 const Session=require("../models/Session");
 const User=require('../models/User');
 const jwt = require('jsonwebtoken');
@@ -34,20 +35,27 @@ SessionController.ckeckAuth=async(req,res,next)=>{
       }
 }
 SessionController.login=async(req,res)=>{
-    const {username,password}=req.body.data;
-    if(username === '' && password=== '') {
-        let token = jwt.sign({username: username},
+    const {username,password}=req.body;    
+    const user = await User.findOne({username:username, password:password});
+    
+    if(user.username != "" && user.password != "") {
+      
+      if(user.username === username && user.password){
+          let token = jwt.sign({username: username},
             config.secret,
             { expiresIn: '24h',
             }
           );
         res.json({
-         mensaje: 'Autenticación correcta',
-         token: token
+        mensaje: 'Autenticación correcta',
+        token: token
         });
-          } else {
-              res.json({ mensaje: "Usuario o contraseña incorrectos"})
-          }
+      }        
+    }else{
+      
+      res.json({ mensaje: "Usuario o contraseña incorrectos"})
+    }
+
 }
 
 

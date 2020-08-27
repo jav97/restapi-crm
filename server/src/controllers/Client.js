@@ -2,15 +2,17 @@ const ClientController = {};
 const Client = require('../models/Client');
 
 
-ClientController.clientPost = (req, res) => {
-    var client = new Client();
+ClientController.postClient = (req, res) => {
+    var client = new Client();  
   
-    client.firstname = req.body.firstname;
-    client.lastname = req.body.lastname;
-    client.email = req.body.email;
+    client.name = req.body.name;
+    client.legalCertificate = req.body.legalCertificate;
+    client.webSite = req.body.webSite;
     client.address = req.body.address;
+    client.numberPhone = req.body.numberPhone;
+    client.sector = req.body.sector;
   
-    if (client.firstname && client.lastname &&  client.email && client.address ) {
+    if (client.name && client.legalCertificate &&  client.webSite && client.numberPhone && client.sector) {
       client.save(function (err) {
         if (err) {
           res.status(422);

@@ -1,46 +1,46 @@
 const ContactController = {};
 const Contact = require('../models/Contact');
+const Client = require('../models/Client');
 
-/**
- * 
- * @param {*} req 
- * @param {*} res 
- */
-ContactController.contacPost = (req, res) => {
-    var contac = new Contact();
+
+ContactController.postContact = async (req, res) => {
+    var contact = new Contact();
+
+    const client = await Client.findById(req.body.client);
+    contact.client =client;
+    contact.name = req.body.name;
+    contact.lastname = req.body.lastname;
+    contact.email = req.body.email;
+    contact.numberPhone = req.body.numberPhone;
+    contact.position = req.body.position;
   
-    contac.firstname = req.body.firstname;
-    contac.lastname = req.body.lastname;
-    contac.email = req.body.email;
-    contac.address = req.body.address;
-  
-    if (contac.firstname && contac.lastname &&  contac.email && contac.address ) {
-      contac.save(function (err) {
+    if (contact.client && contact.name && contact.lastname &&  contact.email && contact.numberPhone && contact.position) {
+      contact.save(function (err) {
         if (err) {
           res.status(422);
-          console.log('error while saving the student', err)
+          console.log('error while saving the contact', err)
           res.json({
-            error: 'There was an error saving the student'
+            error: 'There was an error saving the contact'
           });
         }
         res.status(201);//CREATED
         res.header({
-          'location': `http://localhost:4000/api/contacs/?id=${contac.id}`
+          'location': `http://localhost:4000/api/contacts/?id=${contact.id}`
         });
-        res.json(contac);
+        res.json(contact);
       });
     } else {
       res.status(422);
-      console.log('error while saving the student')
+      console.log('error while saving the contact')
       res.json({
-        error: 'No valid data provided for student'
+        error: 'No valid data provided for contact'
       });
     }
   };
 
 //get all contacts
 ContactController.getContacts = async (req, res) => {
-    const contacts = await Contact.find();
+    const contacts = await Contact.find().populate('Client');
     res.status(200).json(contacts);
 }
 
@@ -67,9 +67,9 @@ ContactController.deleteContact = async (req, res) => {
 //update date of some contact
 ContactController.updateContact = async (req, res) => {
       try {
-        const {name,legalCertificate,webSite,address, numberPhone, sector}=req.body;
-        await contac.findByIdAndUpdate(req.params.id,{name,legalCertificate,webSite,address, numberPhone, sector});
-        res.status(400).json('contac updated');
+        const {client, name,lastname,email,address, numberPhone, position}=req.body;
+        await contact.findByIdAndUpdate(req.params.id,{client, name,lastname,email,address, numberPhone, position});
+        res.status(400).json('contact updated');
       } catch (error) {
            res.json(error);
       }

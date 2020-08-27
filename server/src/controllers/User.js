@@ -1,7 +1,7 @@
 const UserController = {};
 const User = require('../models/User');
 
-UserController.userPost = (req, res) => {
+UserController.postUser = (req, res) => {
     var user = new User();
   
     user.name = req.body.name;
