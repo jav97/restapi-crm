@@ -4,21 +4,22 @@ const Client = require('../models/Client');
 
 ClientController.postClient = (req, res) => {
     var client = new Client();  
-  
-    client.name = req.body.name;
-    client.legalCertificate = req.body.legalCertificate;
-    client.webSite = req.body.webSite;
-    client.address = req.body.address;
-    client.numberPhone = req.body.numberPhone;
-    client.sector = req.body.sector;
+    
+    const {name,legalCertificate,webSite,address,numberPhone,sector}=req.body;
+    client.name = name;
+    client.legalCertificate = legalCertificate;
+    client.webSite = webSite;
+    client.address = address;
+    client.numberPhone = numberPhone;
+    client.sector = sector;
   
     if (client.name && client.legalCertificate &&  client.webSite && client.numberPhone && client.sector) {
       client.save(function (err) {
         if (err) {
           res.status(422);
-          console.log('error while saving the student', err)
+          console.log('error while saving the client', err)
           res.json({
-            error: 'There was an error saving the student'
+            error: 'There was an error saving the client'
           });
         }
         res.status(201);//CREATED
@@ -29,9 +30,9 @@ ClientController.postClient = (req, res) => {
       });
     } else {
       res.status(422);
-      console.log('error while saving the student')
+      console.log('error while saving the client')
       res.json({
-        error: 'No valid data provided for student'
+        error: 'No valid data provided for client'
       });
     }
   };

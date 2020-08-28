@@ -5,6 +5,7 @@ const User=require('../models/User');
 const jwt = require('jsonwebtoken');
 
 SessionController.ckeckAuth=async(req,res,next)=>{
+  console.log(req.headers);
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
         token = req.headers.authorization.split(' ')[1]
         console.log(token);
@@ -35,7 +36,7 @@ SessionController.ckeckAuth=async(req,res,next)=>{
       }
 }
 SessionController.login=async(req,res)=>{
-    const {username,password}=req.body;    
+    const {username,password}=req.body.data;    
     const user = await User.findOne({username:username, password:password});
     
     if(user.username != "" && user.password != "") {

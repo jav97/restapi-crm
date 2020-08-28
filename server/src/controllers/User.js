@@ -1,22 +1,24 @@
 const UserController = {};
 const User = require('../models/User');
+const bcrypt = require('bcrypt');
 
 UserController.postUser = (req, res) => {
     var user = new User();
-  
-    user.name = req.body.name;
-    user.lastname = req.body.lastname;
-    user.username = req.body.username;
-    user.password = req.body.password;
-    user.role = req.body.role;
+
+   const {name,lastname,username,role}=req.body;
+    user.name =name;
+    user.lastname = lastname;
+    user.username = username;
+    user.password = bcrypt.hashSync(req.body.password,8);
+    user.role =role;
   
     if (user.name && user.lastname &&  user.username && user.password && user.role ) {
       user.save(function (err) {
         if (err) {
           res.status(422);
-          console.log('error while saving the student', err)
+          console.log('error while saving the user', err)
           res.json({
-            error: 'There was an error saving the student'
+            error: 'There was an error saving the user'
           });
         }
         res.status(201);//CREATED
@@ -27,9 +29,9 @@ UserController.postUser = (req, res) => {
       });
     } else {
       res.status(422);
-      console.log('error while saving the student')
+      console.log('error while saving the user')
       res.json({
-        error: 'No valid data provided for student'
+        error: 'No valid data provided for user'
       });
     }
   };
