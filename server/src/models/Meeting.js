@@ -20,7 +20,7 @@ const MeetingSchema=new Schema({
         ref : 'user' 
     },
      isVirtual:{
-          type:Boolean,
+          type:String,
           required:true
      },
      client : { 

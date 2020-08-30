@@ -4,12 +4,13 @@ $("#btnSaveContact").click(function () {
     var token = sessionStorage.get()[0]['token'];
     
     var name = document.getElementById('name').value;
-    var client = document.getElementById('client').value;
+    var client = document.getElementById('clients').value;
     var lastname = document.getElementById('lastname').value;
     var email = document.getElementById('email').value;
     var numberPhone = document.getElementById('numberPhone').value;
     var position = document.getElementById('position').value;
-
+ 
+    console.log(client);
     axios.post('http://localhost:4000/api/contacts',{'name':name,'client':client,'lastname':lastname,'email':email,'numberPhone':numberPhone, 'position': position},{
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',
@@ -19,6 +20,7 @@ $("#btnSaveContact").click(function () {
         .then(function (res) {
             if (res.status == 201) {
                 swal('Client created correctly', "", "success");
+                drawTable();
             }
         })
         .catch(function (err) {
@@ -27,10 +29,15 @@ $("#btnSaveContact").click(function () {
 });
 
 window.onload = function(){
+  loadClients();
+  drawTable();
+}
+
+function loadClients(){
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
     
-   axios.get('http://localhost:4000/api/contacts',{
+   axios.get('http://localhost:4000/api/clients',{
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',
             'Authorization': 'Bearer ' + token
@@ -39,42 +46,175 @@ window.onload = function(){
     .then(function(res) {
     if(res.status==200) {
         data = res.data;
-        console.log(data);
-
-        let table = document.getElementById('contacts');
-        table.innerHTML = `
-            <thead">
-                <tr class="text-center">
-                    <th style="display:none;">ID</th>
-                    <th>Cliente</th>
-                    <th>Name</th>
-                    <th>Lastname</th>
-                    <th>Email</th>
-                    <th>Number Phone</th>
-                    <th>Position</th>
-                    <th>Actions</th>
-                </tr>
-            </thead><tbody>`;
-
-            if (data.length == 0) {
-				table.innerHTML += `Not found clients registered`
-			} else {
-				for (let item of data) {
-					table.innerHTML += `<td>${item.client}</td>
-                    <td>${item.name}</td>
-                    <td>${item.lastname}</td>
-                    <td>${item.email}</td>
-                    <td>${item.numberPhone}</td>
-                    <td>${item.position}</td>                    
-                    <td><button class="btn btn-info" id="${item._id}"> <i class="fas fa-edit"></i></button> </td>
-                    <td><button class="btn btn-danger" id="${item._id}"> <i class="fas fa-trash"></i></button> </td>`;
-                }
-                table.innerHTML += `</tbody>`;
-			}
+        for(let i in data){
+            jQuery('#clients').append(`<option value="${data[i]._id}">${data[i].name}</option>`);
+        }
+       
     }
-    console.log(res);
     })
     .catch(function(err) {
     console.log(err);
     })
+}
+
+var drawTable = function () {
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+    axios.get('http://localhost:4000/api/contacts',{
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    }).then(function (res) {
+        if (res.status == 200) {
+            console.log(res.data);
+            var table = $("#contacts").DataTable({
+                responsive: true,
+                "destroy": true,
+                dom: 'Bfrtip',
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+                },
+                searching: true,
+                data: res.data,
+                columns: [
+                    {
+                        targets: [0],
+                        visible: false,
+                        data: "_id"
+                    },
+                    {
+                        data: 'client',
+                        render: function (data) {
+                            let nameCliet;
+                            data.forEach(element => {
+                                nameCliet=element.name;
+                            });
+                            return nameCliet;
+                        }
+                    },
+                    {
+                        data: 'name',
+                        render: function (data) {
+                            return data;
+                        }
+                    },
+
+                    {
+                        data: 'lastname',
+                        render: function (data) {
+                            return data;
+
+                        }
+                    },
+                    {
+                        data: 'email',
+                        render: function (data) {
+                            return data;
+
+                        }
+                    },
+                    {
+                        data: 'numberPhone',
+                        render: function (data) {
+                            return data;
+
+                        }
+                    },
+                    {
+                        data: 'position',
+                        render: function (data) {
+                            return data;
+
+                        }
+                    },
+                    {
+                        data: "_id",
+                        render: function (data) {
+                            var html = '<button type="button" class="edit btn btn-primary"><i class="fas fa-pen"></i></button>';
+                            html += '<button type="button" class="delete btn btn-danger"><i class="fas fa-trash"></i></button>';
+                            return html;
+                        }
+
+                    }
+                ],
+                order: [[1, 'desc']]
+            });
+            editC('#contacts', table);
+             deleteC('#contacts', table);
+
+        }
+    })
+        .catch(function (err) {
+            console.log(err);
+        });
+}
+
+var editC = function (tbody, table) {
+    $(tbody).on("click", "button.edit", async function () {
+        var dataTable = table.row($(this).parents("tr")).data();
+        console.log(dataTable);
+    });
+}
+
+var deleteC = function (tbody, table) {
+    $(tbody).on("click", "button.delete", async function () {
+        var dataTable = table.row($(this).parents("tr")).data();
+        swal({
+            title: "Are you sure?",
+            text: "",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+              swal("Poof! Your contact has been deleted!", {
+                icon: "success",
+              });
+              deleteClient(dataTable._id);
+
+            } else {
+              swal("Your contact is safe!");
+            }
+          });
+        drawTable();
+    });
+}
+
+function deleteClient(id) {
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+    axios.delete(`http://localhost:4000/api/contacts/${id}`, {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+        .then(function (res) {
+            if (res.status == 204) {
+                data = res.data;
+                swal({
+                    title: "Are you sure?",
+                    text: "Once deleted, you will not be able to recover this imaginary file!",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            swal("Poof! Your imaginary file has been deleted!", {
+                                icon: "success",
+                            });
+                        } else {
+                            swal("Your imaginary file is safe!");
+                        }
+                    });
+
+            }
+            console.log(res);
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
 }

@@ -1,8 +1,30 @@
+function deleteClient(id) {
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+    axios.delete(`http://localhost:4000/api/clients/${id}`, {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function (res) {
+        if (res.status == 204) {
+            data = res.data;
+            
+
+        }
+        console.log(res);
+    })
+    .catch(function (err) {
+        console.log(err);
+    })
+}
+
+
 /**
  * add client
  */
 $("#btnSaveClient").click(function () {
-
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
     var name = document.getElementById('name').value;
@@ -12,7 +34,7 @@ $("#btnSaveClient").click(function () {
     var numberPhone = document.getElementById('numberPhone').value;
     var sector = document.getElementById('sector').value;
 
-    axios.post('http://localhost:4000/api/clients',{'name':name,'legalCertificate':legalCertificate,'webSite':webSite,'address':address,'numberPhone':numberPhone, 'sector': sector},{
+    axios.post('http://localhost:4000/api/clients', { 'name': name, 'legalCertificate': legalCertificate, 'webSite': webSite, 'address': address, 'numberPhone': numberPhone, 'sector': sector }, {
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',
             'Authorization': 'Bearer ' + token
@@ -21,6 +43,8 @@ $("#btnSaveClient").click(function () {
         .then(function (res) {
             if (res.status == 201) {
                 swal('Client created correctly', "", "success");
+                drawTable();  
+                clearInput();              
             }
         })
         .catch(function (err) {
@@ -28,55 +52,135 @@ $("#btnSaveClient").click(function () {
         })
 });
 
-window.onload = function(){
+window.onload = function () {
+    drawTable();
+}
+
+var drawTable = function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
-    
-   axios.get('http://localhost:4000/api/clients',{
+    axios.get('http://localhost:4000/api/clients', {
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',
             'Authorization': 'Bearer ' + token
         },
-    })
-    .then(function(res) {
-    if(res.status==200) {
-        data = res.data;
-        console.log(data);
+    }).then(function (res) {
+        if (res.status == 200) {
+            var table = $("#clients").DataTable({
+                responsive: true,
+                "destroy": true,
+                dom: 'Bfrtip',
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+                },
+                searching: true,
+                data: res.data,
+                columns: [
+                    {
+                        targets: [0],
+                        visible: false,
+                        data: "_id"
+                    },
+                    {
+                        data: 'name',
+                        render: function (data) {
+                            return data;
+                        }
+                    },
+                    {
+                        data: 'legalCertificate',
+                        render: function (data) {
+                            return data;
+                        }
+                    },
 
-        let table = document.getElementById('clients');
-        table.innerHTML = `
-            <thead">
-                <tr class="text-center">
-                    <th style="display:none;">ID</th>
-                    <th>Name</th>
-                    <th>Legal Certificate</th>
-                    <th>Website</th>
-                    <th>Address</th>
-                    <th>Number Phone</th>
-                    <th>Sector</th>
-                    <th>Actions</th>
-                </tr>
-            </thead><tbody>`;
+                    {
+                        data: 'webSite',
+                        render: function (data) {
+                            return data;
 
-            if (data.length == 0) {
-				table.innerHTML += `Not found clients registered`
-			} else {
-				for (let item of data) {
-					table.innerHTML += `<td>${item.name}</td>
-                    <td>${item.legalCertificate}</td>
-                    <td>${item.webSite}</td>
-                    <td>${item.address}</td>
-                    <td>${item.numberPhone}</td>
-                    <td>${item.sector}</td>                    
-                    <td><button class="btn btn-info" id="${item._id}"> <i class="fas fa-edit"></i></button> </td>
-                    <td><button class="btn btn-danger" id="${item._id}"> <i class="fas fa-trash"></i></button> </td>`;
-                }
-                table.innerHTML += `</tbody>`;
-			}
-    }
-    console.log(res);
+                        }
+                    },
+                    {
+                        data: 'address',
+                        render: function (data) {
+                            return data;
+
+                        }
+                    },
+                    {
+                        data: 'numberPhone',
+                        render: function (data) {
+                            return data;
+
+                        }
+                    },
+                    {
+                        data: 'sector',
+                        render: function (data) {
+                            return data;
+
+                        }
+                    },
+                    {
+                        data: "_id",
+                        render: function (data) {
+                            var html = '<button type="button" class="edit btn btn-primary"><i class="fas fa-pen"></i></button>';
+                            html += '<button type="button" class="delete btn btn-danger"><i class="fas fa-trash"></i></button>';
+                            return html;
+                        }
+
+                    }
+                ],
+                order: [[0, 'desc']]
+            });
+            editC('#clients', table);
+            deleteC('#clients', table);
+
+        }
     })
-    .catch(function(err) {
-    console.log(err);
-    })
+        .catch(function (err) {
+            console.log(err);
+        });
+}
+
+var editC = function (tbody, table) {
+    $(tbody).on("click", "button.edit", async function () {
+        var dataTable = table.row($(this).parents("tr")).data();
+        console.log(dataTable);
+    });
+}
+
+var deleteC = function (tbody, table) {
+    $(tbody).on("click", "button.delete", async function () {
+        var dataTable = table.row($(this).parents("tr")).data();
+        swal({
+            title: "Are you sure?",
+            text: "",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+              swal("Poof! Your client has been deleted!", {
+                icon: "success",
+              });
+              deleteClient(dataTable._id);
+
+            } else {
+              swal("Your client is safe!");
+            }
+          });
+        drawTable();
+    });
+}
+
+function clearInput(){
+    document.getElementById('name').value = "";
+    document.getElementById('legalCertificate').value = "";
+    document.getElementById('webSite').value = "";
+    document.getElementById('address').value = "";
+    document.getElementById('numberPhone').value = "";
+    document.getElementById('sector').value = "";
 }

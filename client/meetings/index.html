@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/v4-shims.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-info">
@@ -74,16 +75,16 @@
             <div class="form-row">
                 <div class="form-group col-md-4">
                     <label for="">User</label>
-                    <select class="form-control form-control-sm" name="user" id="user">
+                    <select class="form-control form-control-sm" name="users" id="users">
                        
                     </select>
                 </div>
                 <div class="form-group col-md-2">
                     <label for="">Virtual</label><br>
-                    <input type="radio" id="isVirtual" name="isVirtual" value="True">
-                    <label for="isVirtual">Yes</label>
-                    <input type="radio" id="isVirtual" name="isVirtual" value="False"> 
-                    <label for="isVirtual">No</label>
+                    <select class="form-control form-control-sm" name="isVirtual" id="isVirtual">
+                        <option value="Virtual">Yes</option>
+                        <option value="Prescencial">No</option>
+                    </select>
 
                 </div>
                 <div class="form-group col-md-3">
@@ -94,22 +95,38 @@
                 </div>     
                 <div class="form-group col-md-3">
                     <br>
-                    <button class="btn btn-primary" id="btn-axios" type="button">Save</button>
+                    <button class="btn btn-primary" id="btnSaveMeetings" type="button">Save</button>
                 </div>         
             </div>
-        </form>
-        <!-- form to add user inline-->   
+        </form> 
         <!-- Table of Meeting -->
-        <table id="meeting" class="table table-dark">
-    
-        </table>
+        <div class="table-responsive">
+            <table id="meetings" class="table table-success dt-responsive nowrap" style="width:100%">
+                <thead>
+                    <tr class="text-center">
+                        <th style="display:none;">ID</th>
+                        <th>Title</th>
+                        <th>Date</th>
+                        <th>Hour</th>
+                        <th>User</th>
+                        <th>Type meeting</th>
+                        <th>Client</th>
+                        <th>Actions</th>
+                    </tr>
+                  </thead> 
+                  <tbody class="text-center">
+                  </tbody>
+            </table>
+        </div>
     </div>
 </body>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="./js/sessionStorage.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+<script src="../js/sessionStorage.js"></script>
 <script src="./js/meetings.js"></script>
 </html>

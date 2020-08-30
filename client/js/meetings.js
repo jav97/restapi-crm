@@ -1,15 +1,35 @@
-$("#btnSaveClient").click(function () {
-
+function deleteMeeting(id) {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
-    var name = document.getElementById('name').value;
-    var legalCertificate = document.getElementById('legalCertificate').value;
-    var webSite = document.getElementById('webSite').value;
-    var address = document.getElementById('address').value;
-    var numberPhone = document.getElementById('numberPhone').value;
-    var sector = document.getElementById('sector').value;
+    axios.delete(`http://localhost:4000/api/meetings/${id}`, {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+        .then(function (res) {
+            if (res.status == 204) {
+                data = res.data;
+            }
+            console.log(res);
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
+}
 
-    axios.post('http://localhost:4000/api/clients',{'name':name,'legalCertificate':legalCertificate,'webSite':webSite,'address':address,'numberPhone':numberPhone, 'sector': sector},{
+$("#btnSaveMeetings").click(function () {
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+
+    var title =     document.getElementById('title').value;
+    var date =      document.getElementById('date').value.trim();
+    var hour =      document.getElementById('hour').value.trim();
+    var user =      document.getElementById('users').value;
+    var isVirtual = document.getElementById('isVirtual').value;
+    var client =    document.getElementById('client').value;
+
+    axios.post('http://localhost:4000/api/meetings',{'title':title,'date':date,'hour':hour,'user':user,'isVirtual':isVirtual, 'client': client},{
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',
             'Authorization': 'Bearer ' + token
@@ -17,7 +37,9 @@ $("#btnSaveClient").click(function () {
     })
         .then(function (res) {
             if (res.status == 201) {
-                swal('Client created correctly', "", "success");
+                swal('Meeting created correctly', "", "success");
+                drawTable();
+                clearInput();
             }
         })
         .catch(function (err) {
@@ -26,6 +48,58 @@ $("#btnSaveClient").click(function () {
 });
 
 window.onload = function(){
+    loadClients();
+    loadUsers();
+    drawTable();
+}
+
+function loadClients(){
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+    
+   axios.get('http://localhost:4000/api/clients',{
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function(res) {
+    if(res.status==200) {
+        data = res.data;
+        for(let i in data){
+            jQuery('#client').append(`<option value="${data[i]._id}">${data[i].name}</option>`);
+        }    
+    }
+    })
+    .catch(function(err) {
+    console.log(err);
+    })
+}
+function loadUsers(){
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+    
+   axios.get('http://localhost:4000/api/users',{
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function(res) {
+    if(res.status==200) {
+        data = res.data;
+        for(let i in data){
+            jQuery('#users').append(`<option value="${data[i]._id}">${data[i].name}</option>`);
+        }
+       
+    }
+    })
+    .catch(function(err) {
+    console.log(err);
+    })
+}
+
+var drawTable = function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
     
@@ -38,42 +112,126 @@ window.onload = function(){
     .then(function(res) {
     if(res.status==200) {
         data = res.data;
-        console.log(data);
+        var table = $("#meetings").DataTable({
+            responsive: true,
+            "destroy": true,
+            dom: 'Bfrtip',
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+            },
+            searching: true,
+            data: res.data,
+            columns: [
+                {
+                    targets: [0],
+                    visible: false,
+                    data: "_id"
+                },
+                {
+                    data: 'title',
+                    render: function (data) {
+                        return data;
+                    }
+                },
+                {
+                    data: 'date',
+                    render: function (data) {
+                        return data;
+                    }
+                },
 
-        let table = document.getElementById('meeting');
-        table.innerHTML = `
-            <thead">
-                <tr class="text-center">
-                    <th style="display:none;">ID</th>
-                    <th>Title</th>
-                    <th>Date Certificate</th>
-                    <th>Hour</th>
-                    <th>User</th>
-                    <th>Type meeting</th>
-                    <th>Client</th>
-                    <th>Actions</th>
-                </tr>
-            </thead><tbody>`;
+                {
+                    data: 'hour',
+                    render: function (data) {
+                        return data;
 
-            if (data.length == 0) {
-				table.innerHTML += `Not found meeting registered`
-			} else {
-				for (let item of data) {
-					table.innerHTML += `<td>${item.title}</td>
-                    <td>${item.date}</td>
-                    <td>${item.hour}</td>
-                    <td>${item.user}</td>
-                    <td>${item.isVirtual}</td>
-                    <td>${item.client}</td>
-                    <td><button class="btn btn-info" id="${item._id}"> <i class="fas fa-edit"></i></button> </td>
-                    <td><button class="btn btn-danger" id="${item._id}"> <i class="fas fa-trash"></i></button> </td>`;
+                    }
+                },
+                {
+                    data: 'user',
+                    render: function (data) {
+                        let nameUser;
+                        data.forEach(element => {
+                            nameUser=element.name;
+                        });
+                        return nameUser;
+                    }
+                },
+                {
+                    data: 'isVirtual',
+                    render: function (data) {
+                        return data;
+
+                    }
+                },
+                {
+                    data: 'client',
+                    render: function (data) {
+                        let nameClient;
+                        data.forEach(element => {
+                            nameClient=element.name;
+                        });
+                        return nameClient;
+                    }
+                },
+                {
+                    data: "_id",
+                    render: function (data) {
+                        var html = '<button type="button" class="edit btn btn-primary"><i class="fas fa-pen"></i></button>';
+                        html += '<button type="button" class="delete btn btn-danger"><i class="fas fa-trash"></i></button>';
+                        return html;
+                    }
+
                 }
-                table.innerHTML += `</tbody>`;
-			}
-    }
-    console.log(res);
+            ],
+            order: [[0, 'desc']]
+        });
+        editM('#meetings', table);
+        deleteM('#meetings', table);
+
+        }
     })
-    .catch(function(err) {
-    console.log(err);
-    })
+        .catch(function (err) {
+            console.log(err);
+        });
+}
+
+var editM = function (tbody, table) {
+    $(tbody).on("click", "button.edit", async function () {
+        var dataTable = table.row($(this).parents("tr")).data();
+        console.log(dataTable);
+    });
+}
+
+var deleteM = function (tbody, table) {
+    $(tbody).on("click", "button.delete", async function () {
+        var dataTable = table.row($(this).parents("tr")).data();
+        swal({
+            title: "Are you sure?",
+            text: "",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+              swal("Poof! Your meeting file has been deleted!", {
+                icon: "success",
+              });
+              deleteMeeting(dataTable._id)
+            } else {
+              swal("Your meeting file is safe!");
+            }
+          });
+        drawTable();
+    });
+}
+
+function clearInput(){
+    document.getElementById('date').value = "";
+    document.getElementById('title').value = "";
+    document.getElementById('users').value = "";
+    document.getElementById('hour').value = "";
+    document.getElementById('client').value = "";
+    document.getElementById('isVirtual').value = "";
 }

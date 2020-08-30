@@ -8,6 +8,7 @@ const ClientSchema=new Schema({
     legalCertificate:{
         type:String,
         required:true,
+        unique: true
     },
      webSite:{
          type:String,

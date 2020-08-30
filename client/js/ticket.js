@@ -1,15 +1,34 @@
-$("#btnSaveClient").click(function () {
-
+ function deleteTicket(id){
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
-    var name = document.getElementById('name').value;
-    var legalCertificate = document.getElementById('legalCertificate').value;
-    var webSite = document.getElementById('webSite').value;
-    var address = document.getElementById('address').value;
-    var numberPhone = document.getElementById('numberPhone').value;
-    var sector = document.getElementById('sector').value;
+    axios.delete(`http://localhost:4000/api/supportTicket/${id}`, {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function (res) {
+        if (res.status == 204) {
+            data = res.data;
+        }
+        console.log(res);
+    })
+    .catch(function (err) {
+        console.log(err);
+    })
+ }
 
-    axios.post('http://localhost:4000/api/supportTicket',{'name':name,'legalCertificate':legalCertificate,'webSite':webSite,'address':address,'numberPhone':numberPhone, 'sector': sector},{
+$("#btnSaveTicket").click(function () {
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+    
+    var titleProblem = document.getElementById('titleProblem').value;
+    var detailProblem = document.getElementById('detailProblem').value;
+    var whoReportProblem = document.getElementById('whoReportProblem').value;
+    var client = document.getElementById('client').value;
+    var state = document.getElementById('state').value;
+    
+    axios.post('http://localhost:4000/api/supportTicket',{'titleProblem':titleProblem,'detailProblem':detailProblem,'whoReportProblem':whoReportProblem,'client':client,'state':state },{
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',
             'Authorization': 'Bearer ' + token
@@ -18,6 +37,7 @@ $("#btnSaveClient").click(function () {
         .then(function (res) {
             if (res.status == 201) {
                 swal('Client created correctly', "", "success");
+                drawTable();
             }
         })
         .catch(function (err) {
@@ -26,6 +46,11 @@ $("#btnSaveClient").click(function () {
 });
 
 window.onload = function(){
+    loadClients()
+    drawTable()
+}
+
+var drawTable = function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
     
@@ -38,40 +63,127 @@ window.onload = function(){
     .then(function(res) {
     if(res.status==200) {
         data = res.data;
-        console.log(data);
+        var table = $("#tickets").DataTable({
+            responsive: true,
+            "destroy": true,
+            dom: 'Bfrtip',
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+            },
+            searching: true,
+            data: res.data,
+            columns: [
+                {
+                    targets: [0],
+                    visible: false,
+                    data: "_id"
+                },
+                {
+                    data: 'titleProblem',
+                    render: function (data) {
+                        return data;
+                    }
+                },
+                {
+                    data: 'detailProblem',
+                    render: function (data) {
+                        return data;
+                    }
+                },
+                {
+                    data: 'whoReportProblem',
+                    render: function (data) {
+                        return data;
 
-        let table = document.getElementById('tickets');
-        table.innerHTML = `
-            <thead">
-                <tr class="text-center">
-                    <th style="display:none;">ID</th>
-                    <th>Title Problem</th>
-                    <th>Details</th>
-                    <th>Who Report Problem?</th>
-                    <th>Client</th>
-                    <th>State</th>
-                    <th>Actions</th>
-                </tr>
-            </thead><tbody>`;
+                    }
+                },
+                {
+                    data: 'client',
+                    render: function (data) {
+                        let nameClient;
+                        data.forEach(element => {
+                            nameClient=element.name;
+                        });
+                        return nameClient;
+                    }
+                },
+                {
+                    data: 'state',
+                    render: function (data) {
+                        return data;
 
-            if (data.length == 0) {
-				table.innerHTML += `Not found tickets registered`
-			} else {
-				for (let item of data) {
-					table.innerHTML += `<td>${item.titleProblem}</td>
-                    <td>${item.detailProblem}</td>
-                    <td>${item.whoReportProblem}</td>
-                    <td>${item.client.name}</td>
-                    <td>${item.state}</td>
-                    <td><button class="btn btn-info" id="${item._id}"> <i class="fas fa-edit"></i></button> </td>
-                    <td><button class="btn btn-danger" id="${item._id}"> <i class="fas fa-trash"></i></button> </td>`;
+                    }
+                },
+                {
+                    data: "_id",
+                    render: function (data) {
+                        var html = '<button type="button" class="edit btn btn-primary"><i class="fas fa-pen"></i></button>';
+                        html += '<button type="button" class="delete btn btn-danger"><i class="fas fa-trash"></i></button>';
+                        return html;
+                    }
+
                 }
-                table.innerHTML += `</tbody>`;
-			}
+            ],
+            order: [[0, 'desc']]
+        });
+        editT('#tickets', table);
+        deleteT('#tickets', table);
     }
-    console.log(res);
+    }).catch(function (err) {
+        console.log(err);
+    });
+}
+var editT = function (tbody, table) {
+    $(tbody).on("click", "button.edit", async function () {
+        var dataTable = table.row($(this).parents("tr")).data();
+        console.log(dataTable);
+    });
+}
+
+var deleteT = function (tbody, table) {
+    $(tbody).on("click", "button.delete", async function () {
+        var dataTable = table.row($(this).parents("tr")).data();
+        swal({
+            title: "Are you sure?",
+            text: "",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+              swal("Poof! Your ticket file has been deleted!", {
+                icon: "success",
+              });
+              deleteTicket(dataTable._id);
+
+            } else {
+              swal("Your ticket file is safe!");
+            }
+          });
+        drawTable();
+    });
+}
+function loadClients(){
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+    
+   axios.get('http://localhost:4000/api/clients',{
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function(res) {
+    if(res.status==200) {
+        data = res.data;
+        for(let i in data){
+            jQuery('#client').append(`<option value="${data[i]._id}">${data[i].name}</option>`);
+        }   
+    }
     })
     .catch(function(err) {
     console.log(err);
     })
 }
+

@@ -1,14 +1,13 @@
-const SessionController={};
+const SessionController = {};
 const config = require('../config');
-const Session=require("../models/Session");
-const User=require('../models/User');
+const Session = require("../models/Session");
+const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 SessionController.ckeckAuth=async(req,res,next)=>{
-  console.log(req.headers);
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
         token = req.headers.authorization.split(' ')[1]
-        console.log(token);
       }else{
         return res.json({
                   success: false,
@@ -35,28 +34,29 @@ SessionController.ckeckAuth=async(req,res,next)=>{
         });
       }
 }
-SessionController.login=async(req,res)=>{
-    const {username,password}=req.body.data;    
-    const user = await User.findOne({username:username, password:password});
-    
-    if(user.username != "" && user.password != "") {
-      
-      if(user.username === username && user.password){
-          let token = jwt.sign({username: username},
-            config.secret,
-            { expiresIn: '24h',
-            }
-          );
-        res.json({
+SessionController.login = async (req, res) => {
+  const { username, password } = req.body.data;
+  const user = await User.findOne({ username: username });
+  console.log(user);
+  if (user.username != "" && user.password != "") {
+    let bool = bcrypt.compareSync(password, user.password);
+    if (bool) {
+      let token = jwt.sign({ username: username },
+        config.secret,
+        {
+          expiresIn: '24h',
+        }
+      );
+      res.json({
         mensaje: 'Autenticación correcta',
         token: token
-        });
-      }        
-    }else{
-      
-      res.json({ mensaje: "Usuario o contraseña incorrectos"})
+      });
+    } else if (bool == false) {
+      res.json({ mensaje: "Contraseña incorrecta" })
     }
-
+  } else {
+    res.json({ mensaje: "Usuario no encontrado" })
+  }
 }
 
 

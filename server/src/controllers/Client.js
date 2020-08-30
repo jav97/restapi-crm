@@ -55,13 +55,13 @@ ClientController.getClient = async (req, res) => {
 
 //delete client of database
 ClientController.deleteClient = async (req, res) => {
-    try {
-         await Client.findByIdAndDelete(req.params.id);
-         res.json('Client is Deleted');
-    } catch (error) {
-        res.json(error);
-    }
-}
+  try {
+      await Client.findByIdAndDelete(req.params.id);
+      res.json('Client is Deleted');
+  } catch (error) {
+    res.json(error);
+  }
+};
 
 //update date of some client
 ClientController.updateClient = async (req, res) => {
