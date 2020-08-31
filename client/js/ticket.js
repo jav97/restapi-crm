@@ -1,3 +1,4 @@
+ //delete support ticket
  function deleteTicket(id){
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -10,6 +11,7 @@
     .then(function (res) {
         if (res.status == 204) {
             data = res.data;
+            drawTable();
         }
         console.log(res);
     })
@@ -17,16 +19,16 @@
         console.log(err);
     })
  }
-
+// save support ticket
 $("#btnSaveTicket").click(function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
     
-    var titleProblem = document.getElementById('titleProblem').value;
-    var detailProblem = document.getElementById('detailProblem').value;
+    var titleProblem =     document.getElementById('titleProblem').value;
+    var detailProblem =    document.getElementById('detailProblem').value;
     var whoReportProblem = document.getElementById('whoReportProblem').value;
-    var client = document.getElementById('client').value;
-    var state = document.getElementById('state').value;
+    var client =           document.getElementById('client').value;
+    var state =            document.getElementById('state').value;
     
     axios.post('http://localhost:4000/api/supportTicket',{'titleProblem':titleProblem,'detailProblem':detailProblem,'whoReportProblem':whoReportProblem,'client':client,'state':state },{
         headers: {
@@ -50,6 +52,7 @@ window.onload = function(){
     drawTable()
 }
 
+// load all data of tickets
 var drawTable = function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -133,13 +136,44 @@ var drawTable = function () {
         console.log(err);
     });
 }
+
+//load one tickets for id
+function getTicket(id){
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+
+    axios.get(`http://localhost:4000/api/supportTicket/${id}`, {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function (res) {
+        if (res.status == 200) {
+            data = (res.data);           
+            document.getElementById('titleProblem').value = data.titleProblem;
+            document.getElementById('detailProblem').value = data.detailProblem;
+            document.getElementById('whoReportProblem').value = data.whoReportProblem;
+            document.getElementById('client').value = data.client;
+            document.getElementById('state').value = data.state;
+        }
+        console.log(res);
+    })
+    .catch(function (err) {
+        console.log(err);
+    })
+}
+
+//call getTicket and charge data in the inputs to update
 var editT = function (tbody, table) {
     $(tbody).on("click", "button.edit", async function () {
         var dataTable = table.row($(this).parents("tr")).data();
-        console.log(dataTable);
+        getTicket(dataTable._id);
+        $('#btnUpdateTicket').attr('hidden',false)
+        $('#btnSaveTicket').attr('hidden',true)
     });
 }
-
+//call deleteTickets
 var deleteT = function (tbody, table) {
     $(tbody).on("click", "button.delete", async function () {
         var dataTable = table.row($(this).parents("tr")).data();
@@ -164,6 +198,8 @@ var deleteT = function (tbody, table) {
         drawTable();
     });
 }
+
+//load clients to select
 function loadClients(){
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -187,3 +223,17 @@ function loadClients(){
     })
 }
 
+function clearInput(){
+    document.getElementById('titleProblem').value = "";
+    document.getElementById('detailProblem').value = "";
+    document.getElementById('whoReportProblem').value = "";
+    document.getElementById('client').value = "";
+    document.getElementById('state').value = "";
+}
+
+//changes atrr of buttons
+$("#cancel").click(function (){
+    $('#btnUpdateTicket').attr('hidden',true)
+    $('#btnSaveTicket').attr('hidden',false)
+    clearInput();
+});

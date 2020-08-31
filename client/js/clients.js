@@ -1,3 +1,4 @@
+//delete Client
 function deleteClient(id) {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -20,10 +21,7 @@ function deleteClient(id) {
     })
 }
 
-
-/**
- * add client
- */
+//add client
 $("#btnSaveClient").click(function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -56,6 +54,7 @@ window.onload = function () {
     drawTable();
 }
 
+//draw table with all clients
 var drawTable = function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -144,9 +143,40 @@ var drawTable = function () {
         });
 }
 
+function getClient(id){
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+
+    axios.get(`http://localhost:4000/api/clients/${id}`, {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function (res) {
+        if (res.status == 200) {
+            data = (res.data);
+            document.getElementById('name').value = data.name;
+            document.getElementById('webSite').value = data.webSite;
+            document.getElementById('legalCertificate').value = data.legalCertificate;
+            document.getElementById('numberPhone').value = data.legalCertificate;
+            document.getElementById('address').value = data.address;
+            document.getElementById('sector').value = data.sector;
+        }
+        console.log(res);
+    })
+    .catch(function (err) {
+        console.log(err);
+    })
+}
+
+//call getClient and charge data in the inputs to update
 var editC = function (tbody, table) {
     $(tbody).on("click", "button.edit", async function () {
         var dataTable = table.row($(this).parents("tr")).data();
+        getClient(dataTable._id);
+        $('#btnUpdateClient').attr('hidden',false)
+        $('#btnSaveClient').attr('hidden',true)
         console.log(dataTable);
     });
 }
@@ -175,6 +205,12 @@ var deleteC = function (tbody, table) {
         drawTable();
     });
 }
+//clear input and reset attr of buttons
+$("#cancel").click(function (){
+    $('#btnUpdateClient').attr('hidden',true)
+    $('#btnSaveClient').attr('hidden',false)
+    clearInput();
+});
 
 function clearInput(){
     document.getElementById('name').value = "";

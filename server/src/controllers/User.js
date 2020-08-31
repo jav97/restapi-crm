@@ -66,7 +66,7 @@ UserController.deleteUser = async (req, res) => {
 UserController.updateUser = async (req, res) => {
       try {
             const {name,lastname,username,password}=req.body;
-            await User.findByIdAndUpdate(req.params.id,{name,lastname,username,password});
+            await User.findOnedAndUpdate(req.params.id,{name,lastname,username,password});
             res.status(400).json('User updated');
       } catch (error) {
            res.json(error);

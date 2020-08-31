@@ -1,14 +1,53 @@
+//delete contacts of the server
+function deleteClient(id) {
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+    axios.delete(`http://localhost:4000/api/contacts/${id}`, {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+        })
+        .then(function (res) {
+            if (res.status == 204) {
+                data = res.data;
+                swal({
+                    title: "Are you sure?",
+                    text: "Once deleted, you will not be able to recover this imaginary file!",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            swal("Poof! Your imaginary file has been deleted!", {
+                                icon: "success",
+                            });
+                        } else {
+                            swal("Your imaginary file is safe!");
+                        }
+                    });
+
+            }
+            console.log(res);
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
+}
+
+//save contact
 $("#btnSaveContact").click(function () {
 
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
     
-    var name = document.getElementById('name').value;
-    var client = document.getElementById('clients').value;
-    var lastname = document.getElementById('lastname').value;
-    var email = document.getElementById('email').value;
+    var name =        document.getElementById('name').value;
+    var client =      document.getElementById('clients').value;
+    var lastname =    document.getElementById('lastname').value;
+    var email =       document.getElementById('email').value;
+    var position =    document.getElementById('position').value;
     var numberPhone = document.getElementById('numberPhone').value;
-    var position = document.getElementById('position').value;
  
     console.log(client);
     axios.post('http://localhost:4000/api/contacts',{'name':name,'client':client,'lastname':lastname,'email':email,'numberPhone':numberPhone, 'position': position},{
@@ -57,6 +96,7 @@ function loadClients(){
     })
 }
 
+//load data of all contacts
 var drawTable = function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -150,13 +190,45 @@ var drawTable = function () {
         });
 }
 
+//get one contact for id
+function getContact(id){
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+
+    axios.get(`http://localhost:4000/api/contacts/${id}`, {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function (res) {
+        if (res.status == 200) {
+            data = (res.data);           
+            document.getElementById('name').value = data.name;
+            document.getElementById('clients').value = data.client;
+            document.getElementById('lastname').value = data.lastname;
+            document.getElementById('numberPhone').value = data.numberPhone;
+            document.getElementById('email').value = data.email;
+            document.getElementById('position').value = data.position;
+        }
+        console.log(res);
+    })
+    .catch(function (err) {
+        console.log(err);
+    })
+}
+
+//call getContact and charge data in the inputs to update
 var editC = function (tbody, table) {
     $(tbody).on("click", "button.edit", async function () {
         var dataTable = table.row($(this).parents("tr")).data();
-        console.log(dataTable);
+        getContact(dataTable._id);
+        $('#btnUpdateContact').attr('hidden',false)
+        $('#btnSaveContact').attr('hidden',true)
     });
 }
 
+//call deleteClient and ask you want delete contact
 var deleteC = function (tbody, table) {
     $(tbody).on("click", "button.delete", async function () {
         var dataTable = table.row($(this).parents("tr")).data();
@@ -182,39 +254,18 @@ var deleteC = function (tbody, table) {
     });
 }
 
-function deleteClient(id) {
-    let sessionStorage = new SessionStorageDB('token');
-    var token = sessionStorage.get()[0]['token'];
-    axios.delete(`http://localhost:4000/api/contacts/${id}`, {
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Authorization': 'Bearer ' + token
-        },
-    })
-        .then(function (res) {
-            if (res.status == 204) {
-                data = res.data;
-                swal({
-                    title: "Are you sure?",
-                    text: "Once deleted, you will not be able to recover this imaginary file!",
-                    icon: "warning",
-                    buttons: true,
-                    dangerMode: true,
-                })
-                    .then((willDelete) => {
-                        if (willDelete) {
-                            swal("Poof! Your imaginary file has been deleted!", {
-                                icon: "success",
-                            });
-                        } else {
-                            swal("Your imaginary file is safe!");
-                        }
-                    });
+//clear input and reset attr of buttons
+$("#cancel").click(function (){
+    $('#btnUpdateContact').attr('hidden',true)
+    $('#btnSaveContact').attr('hidden',false)
+    clearInput();
+});
 
-            }
-            console.log(res);
-        })
-        .catch(function (err) {
-            console.log(err);
-        })
+function clearInput(){
+    document.getElementById('name').value= "";
+    document.getElementById('clients').value = "";
+    document.getElementById('lastname').value = "";
+    document.getElementById('email').value = "";
+    document.getElementById('position').value = "";
+    document.getElementById('numberPhone').value = "";
 }

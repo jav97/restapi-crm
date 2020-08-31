@@ -56,19 +56,11 @@
     </nav>
     <div class="container">
         <h1>Contacts</h1>
-        <!-- form to add user inline-->
-        <!-- contact.client =client;
-        contact.name = req.body.name;
-        contact.lastname = req.body.lastname;
-        contact.email = req.body.email;
-        contact.numberPhone = req.body.numberPhone;
-        contact.position = req.body.position; -->
         <form>
             <div class="form-row">
                 <div class="form-group col-md-4">
                     <label for="">Client</label>
-                    <select class="form-control" name="clients" id="clients">
-                        
+                    <select class="form-control" name="clients" id="clients">                        
                     </select>
                 </div>
                 <div class="form-group col-md-4">
@@ -96,28 +88,32 @@
                 <div class="form-group col-md-3">
                     <br>
                     <button class="btn btn-primary" id="btnSaveContact" type="button">Save</button>
+                    <button hidden class="btn btn-warning" id="btnUpdateContact" onclick="updateUser()" type="button">Update</button>
+                    <button class="btn btn-danger" id="cancel" type="button">Cancel</button>
                 </div>         
-            </div>
+                </div>         
+            
         </form>
-        <!-- form to add user inline-->
-        <table id="contacts" class="table table-success dt-responsive nowrap" style="width:100%">
-            <thead>
-                <tr class="text-center">
-                    <th style="display:none;">ID</th>
-                    <th>Client</th>
-                    <th>Name</th>
-                    <th>LastName</th>
-                    <th>Email</th> 
-                    <th>Number Phone</th> 
-                    <th>Position</th>
-                    <th>Actions</th>
-                </tr>
-              </thead> 
-              <tbody class="text-center">
-              </tbody>
-        </table> 
-    </div>
 
+        <div class="table-responsive">
+            <table id="contacts" class="table table-success nowrap" style="width:100%">
+                <thead>
+                    <tr class="text-center">
+                        <th style="display:none;">ID</th>
+                        <th>Client</th>
+                        <th>Name</th>
+                        <th>LastName</th>
+                        <th>Email</th> 
+                        <th>Number Phone</th> 
+                        <th>Position</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead> 
+                <tbody class="text-center">
+                </tbody>
+            </table> 
+        </div>
+    </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>

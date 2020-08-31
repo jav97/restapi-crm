@@ -1,3 +1,4 @@
+//delete meeting
 function deleteMeeting(id) {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -18,6 +19,7 @@ function deleteMeeting(id) {
         })
 }
 
+//save meeting
 $("#btnSaveMeetings").click(function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -53,6 +55,7 @@ window.onload = function(){
     drawTable();
 }
 
+//load clients to select
 function loadClients(){
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -75,6 +78,8 @@ function loadClients(){
     console.log(err);
     })
 }
+
+//load users to select
 function loadUsers(){
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -196,13 +201,44 @@ var drawTable = function () {
         });
 }
 
+//load one meeting for id
+function getMeeting(id){
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+
+    axios.get(`http://localhost:4000/api/meetings/${id}`, {
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function (res) {
+        if (res.status == 200) {
+            data = (res.data);           
+            document.getElementById('date').value = data.date;
+            document.getElementById('title').value = data.title;
+            document.getElementById('users').value = data.user;
+            document.getElementById('hour').value = data.hour;
+            document.getElementById('client').value = data.client;
+            document.getElementById('isVirtual').value = data.isVirtual;
+        }
+        console.log(res);
+    })
+    .catch(function (err) {
+        console.log(err);
+    })
+}
+
+//call getMeeting and charge data in the inputs to update
 var editM = function (tbody, table) {
     $(tbody).on("click", "button.edit", async function () {
         var dataTable = table.row($(this).parents("tr")).data();
-        console.log(dataTable);
+        getMeeting(dataTable._id);
+        $('#btnUpdateMeeting').attr('hidden',false)
+        $('#btnSaveMeetings').attr('hidden',true)
     });
 }
-
+//call deleteMeeting
 var deleteM = function (tbody, table) {
     $(tbody).on("click", "button.delete", async function () {
         var dataTable = table.row($(this).parents("tr")).data();
@@ -226,6 +262,13 @@ var deleteM = function (tbody, table) {
         drawTable();
     });
 }
+
+//clear input and reset attr of buttons
+$("#cancel").click(function (){
+    $('#btnUpdateMeeting').attr('hidden',true)
+    $('#btnSaveMeetings').attr('hidden',false)
+    clearInput();
+});
 
 function clearInput(){
     document.getElementById('date').value = "";
