@@ -45,43 +45,45 @@
                 <li class="nav-item">
                     <a class="btn btn-warning" href=""><i class="fas fa-user-cog"></i></a>
                 </li>
-                <li class="nav-item">
-                    <form action="" method="POST">
-                    
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-sign-out-alt"></i></button>
-                    </form>
+                <li class="nav-item">                    
+                    <button type="submit" id="logout" onclick="logout()" class="btn btn-primary"><i class="fas fa-sign-out-alt"></i></button>
                 </li>
             </ul>
         </div>
     </nav>
+
     <div class="container">
         <h1>Meetings</h1>
         <!-- form to add user inline-->
         <form>
             <div class="form-row">
+                <div hidden class="form-group col-md-4">
+                    <label for="">ID</label>
+                    <input type="text" id="_id" name="_id" class="form-control" required>
+                </div>
                 <div class="form-group col-md-4">
                     <label for="">Title</label>
-                    <input type="text" id="title" name="title" class="form-control">
+                    <input type="text" id="title" name="title" class="form-control" required>
                 </div>
                 <div class="form-group col-md-4">
                     <label for="">Date</label>
-                    <input type="date" id="date" name="date" class="form-control">
+                    <input type="date" id="date" name="date" class="form-control" required>
                 </div>
                 <div class="form-group col-md-4">
                     <label for="">Hour</label>
-                    <input type="time" id="hour" name="hour" class="form-control">
+                    <input type="time" id="hour" name="hour" class="form-control" required>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-4">
                     <label for="">User</label>
-                    <select class="form-control form-control-sm" name="users" id="users">
+                    <select class="form-control form-control-sm" name="users" id="users" required>
                        
                     </select>
                 </div>
                 <div class="form-group col-md-2">
                     <label for="">Virtual</label><br>
-                    <select class="form-control form-control-sm" name="isVirtual" id="isVirtual">
+                    <select class="form-control form-control-sm" name="isVirtual" id="isVirtual" required>
                         <option value="Virtual">Yes</option>
                         <option value="Prescencial">No</option>
                     </select>
@@ -89,14 +91,14 @@
                 </div>
                 <div class="form-group col-md-3">
                     <label for="">Client</label>
-                    <select class="form-control form-control-sm" name="client" id="client">
+                    <select class="form-control form-control-sm" name="client" id="client" required>
                        
                     </select>
                 </div>     
                 <div class="form-group col-md-3">
                     <br>
                     <button class="btn btn-primary" id="btnSaveMeetings" type="button">Save</button>
-                    <button hidden class="btn btn-warning" id="btnUpdateMeeting" onclick="updateMeeting()" type="button">Update</button>
+                    <button hidden class="btn btn-warning" id="btnUpdateMeeting" type="button">Update</button>
                     <button class="btn btn-danger" id="cancel" type="button">Cancel</button>
                 </div>       
             </div>

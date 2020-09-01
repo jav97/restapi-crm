@@ -24,28 +24,32 @@ $("#btnSaveUser").click(function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
 
-    var username = document.getElementById('username').value;
     var name = document.getElementById('name').value;
     var lastname = document.getElementById('lastname').value;
     var username = document.getElementById('username').value;
     var password = document.getElementById('password').value;
     var role = document.getElementById('role').value;   
-    axios.post('http://localhost:4000/api/users',{'name':name,'lastname':lastname,'username':username,'password':password,'role':role},{
+    if(name=="" ||lastname == "" || username=="" ||password=="" || role==""){
+        swal('User incomplete correctly', "", "error")
+    }else{
+        axios.post('http://localhost:4000/api/users',{'name':name,'lastname':lastname,'username':username,'password':password,'role':role},{
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',
             'Authorization': 'Bearer ' + token
         },
-    })
-    .then(function (res) {
-        if (res.status == 201) {
-            swal('User created correctly', "", "success");
-            clearInput();
-            drawTable();
-        }
-    })
-    .catch(function (err) {
-        console.log(err);
-    })
+        })
+        .then(function (res) {
+            if (res.status == 201) {
+                swal('User created correctly', "", "success");
+                clearInput();
+                drawTable();
+            }
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
+    }
+    
 });
 
 window.onload = function(){
@@ -111,12 +115,11 @@ var drawTable = function () {
             });
             editU('#users', table);
             deleteU('#users', table);
-
         }
     })
-        .catch(function (err) {
-            console.log(err);
-        });
+    .catch(function (err) {
+        console.log(err);
+    });
 }
 
 //get one user and charge info in the inputs
@@ -133,15 +136,14 @@ function getUser(id){
     .then(function (res) {
         if (res.status == 200) {
             data = (res.data);
-            console.log(data.name);
-
+            console.log(data._id);
+            document.getElementById('_id').value = data._id;
             document.getElementById('name').value = data.name;
             document.getElementById('lastname').value = data.lastname;
             document.getElementById('username').value = data.username;
             document.getElementById('password').value = "";
             document.getElementById('role').value = data.role; 
         }
-        console.log(res);
     })
     .catch(function (err) {
         console.log(err);
@@ -192,28 +194,30 @@ var deleteU = function (tbody, table) {
 }
 
 // update data of user selected
-function updateUser(id) {
+function updateUser(){
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
 
+    var id = document.getElementById('_id').value;
     var username = document.getElementById('username').value;
-    var name =         document.getElementById('name').value;
-    var lastname =     document.getElementById('lastname').value;
-    var username =     document.getElementById('username').value;
-    var password =     document.getElementById('password').value;
-    var role =         document.getElementById('role').value;
+    var name = document.getElementById('name').value;
+    var lastname = document.getElementById('lastname').value;
+    var password = document.getElementById('password').value;
+    var role = document.getElementById('role').value;  
     
-    axios.put(`http://localhost:4000/api/users/${id}`,{'name':name,'lastname':lastname,'username':username,'password':password,'role':role},{
+    axios.put(`http://localhost:4000/api/users/${id}`,{data:{'name':name,'lastname':lastname,'username':username,'password':password,'role':role}},
+    {
         headers: {
             'Content-Type': 'application/json;charset=UTF-8',
             'Authorization': 'Bearer ' + token
         },
     })
-        .then(function (res) {
-            if (res.status == 400) {
+    .then(function (res) {
+        console.log(res.status)
+        if (res.status == 200) {
                 swal('User update correctly', "", "success");
-                clearInput();
                 drawTable();
+                clearInput();
             }
         })
         .catch(function (err) {

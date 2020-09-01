@@ -1,3 +1,43 @@
+window.onload = function(){
+    loadClients();
+    loadUsers();
+    drawTable();
+}
+
+//save meeting
+$("#btnSaveMeetings").click(function () {
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+
+    var title =     document.getElementById('title').value;
+    var date =      document.getElementById('date').value.trim();
+    var hour =      document.getElementById('hour').value.trim();
+    var user =      document.getElementById('users').value;
+    var isVirtual = document.getElementById('isVirtual').value;
+    var client =    document.getElementById('client').value;
+    if(title =="" || date ==""|| hour ==""|| user ==""|| isVirtual ==""|| client == ""){
+        swal('Meeting data incomplete', "", "error");
+    }else{
+        axios.post('http://localhost:4000/api/meetings',{'title':title,'date':date,'hour':hour,'user':user,'isVirtual':isVirtual, 'client': client},{
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+        })
+        .then(function (res) {
+            if (res.status == 201) {
+                swal('Meeting created correctly', "", "success");
+                drawTable();
+                clearInput();
+            }
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
+    }    
+});
+
+
 //delete meeting
 function deleteMeeting(id) {
     let sessionStorage = new SessionStorageDB('token');
@@ -19,41 +59,6 @@ function deleteMeeting(id) {
         })
 }
 
-//save meeting
-$("#btnSaveMeetings").click(function () {
-    let sessionStorage = new SessionStorageDB('token');
-    var token = sessionStorage.get()[0]['token'];
-
-    var title =     document.getElementById('title').value;
-    var date =      document.getElementById('date').value.trim();
-    var hour =      document.getElementById('hour').value.trim();
-    var user =      document.getElementById('users').value;
-    var isVirtual = document.getElementById('isVirtual').value;
-    var client =    document.getElementById('client').value;
-
-    axios.post('http://localhost:4000/api/meetings',{'title':title,'date':date,'hour':hour,'user':user,'isVirtual':isVirtual, 'client': client},{
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Authorization': 'Bearer ' + token
-        },
-    })
-        .then(function (res) {
-            if (res.status == 201) {
-                swal('Meeting created correctly', "", "success");
-                drawTable();
-                clearInput();
-            }
-        })
-        .catch(function (err) {
-            console.log(err);
-        })
-});
-
-window.onload = function(){
-    loadClients();
-    loadUsers();
-    drawTable();
-}
 
 //load clients to select
 function loadClients(){
@@ -104,6 +109,7 @@ function loadUsers(){
     })
 }
 
+//load data of meetings and draw table
 var drawTable = function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
@@ -201,41 +207,20 @@ var drawTable = function () {
         });
 }
 
-//load one meeting for id
-function getMeeting(id){
-    let sessionStorage = new SessionStorageDB('token');
-    var token = sessionStorage.get()[0]['token'];
-
-    axios.get(`http://localhost:4000/api/meetings/${id}`, {
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Authorization': 'Bearer ' + token
-        },
-    })
-    .then(function (res) {
-        if (res.status == 200) {
-            data = (res.data);           
-            document.getElementById('date').value = data.date;
-            document.getElementById('title').value = data.title;
-            document.getElementById('users').value = data.user;
-            document.getElementById('hour').value = data.hour;
-            document.getElementById('client').value = data.client;
-            document.getElementById('isVirtual').value = data.isVirtual;
-        }
-        console.log(res);
-    })
-    .catch(function (err) {
-        console.log(err);
-    })
-}
-
 //call getMeeting and charge data in the inputs to update
 var editM = function (tbody, table) {
     $(tbody).on("click", "button.edit", async function () {
         var dataTable = table.row($(this).parents("tr")).data();
-        getMeeting(dataTable._id);
-        $('#btnUpdateMeeting').attr('hidden',false)
-        $('#btnSaveMeetings').attr('hidden',true)
+        document.getElementById('_id').value = dataTable._id;
+        document.getElementById('date').value = dataTable.date;
+        document.getElementById('title').value = dataTable.title;
+        document.getElementById('users').value = dataTable.user.name;
+        document.getElementById('hour').value = dataTable.hour;
+        document.getElementById('client').value = dataTable.client.name;
+        document.getElementById('isVirtual').value = dataTable.isVirtual;
+        $('#btnUpdateMeeting').attr('hidden', false);
+        $('#btnSaveMeetings').attr('hidden', true);
+        drawTable();
     });
 }
 //call deleteMeeting
@@ -270,11 +255,45 @@ $("#cancel").click(function (){
     clearInput();
 });
 
+//update meeting for id
+$("#btnUpdateMeeting").click(function () {
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+    var id =        document.getElementById('_id').value;
+    var title =        document.getElementById('title').value;
+    var date =    document.getElementById('date').value;
+    var client =      document.getElementById('client').value;
+    var user =      document.getElementById('users').value;    
+    var hour =       document.getElementById('hour').value;
+    var isVirtual =    document.getElementById('isVirtual').value;
+    
+    var meeting = {'title':title,'client':client,'date':date,'hour':hour,'user':user, 'isVirtual': isVirtual};
+    axios.put(`http://localhost:4000/api/meetings/${id}`,meeting,{
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+        .then(function (res) {
+            if (res.status == 200) {
+                data = res.data
+                console.log(data);
+                swal('User update correctly', "", "success");
+                clearInput();
+                drawTable();
+            }
+        })
+        .catch(function (err) {
+            console.log(err);
+        })
+});
+
+
 function clearInput(){
     document.getElementById('date').value = "";
     document.getElementById('title').value = "";
-    document.getElementById('users').value = "";
+    document.getElementById('users').value;
     document.getElementById('hour').value = "";
-    document.getElementById('client').value = "";
+    document.getElementById('client').value;
     document.getElementById('isVirtual').value = "";
 }

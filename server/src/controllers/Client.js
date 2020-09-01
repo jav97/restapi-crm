@@ -68,7 +68,7 @@ ClientController.updateClient = async (req, res) => {
       try {
         const {name,legalCertificate,webSite,address, numberPhone, sector}=req.body;
         await Client.findByIdAndUpdate(req.params.id,{name,legalCertificate,webSite,address, numberPhone, sector});
-        res.status(400).json('Client updated');
+        res.status(200).json('Client updated');
       } catch (error) {
            res.json(error);
       }

@@ -67,9 +67,10 @@ ContactController.deleteContact = async (req, res) => {
 //update date of some contact
 ContactController.updateContact = async (req, res) => {
       try {
-        const {client, name,lastname,email,address, numberPhone, position}=req.body;
-        await contact.findByIdAndUpdate(req.params.id,{client, name,lastname,email,address, numberPhone, position});
-        res.status(400).json('contact updated');
+        const client = await Client.findById(req.body.client);
+        const {name,lastname,email,address, numberPhone, position}=req.body;
+        await Contact.findByIdAndUpdate(req.params.id,{client, name,lastname,email,address, numberPhone, position});
+        res.status(200).json('contact updated');
       } catch (error) {
            res.json(error);
       }

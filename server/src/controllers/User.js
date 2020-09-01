@@ -54,23 +54,25 @@ UserController.getUser = async (req, res) => {
 
 //delete user of database
 UserController.deleteUser = async (req, res) => {
-    try {
-         await User.findByIdAndDelete(req.params.id);
-         res.json('User is Deleted');
-    } catch (error) {
-        res.json(error);
-    }
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json('User is Deleted');
+  } catch (error) {
+    res.json(error);
+  }
 }
 
 //update date of some user
 UserController.updateUser = async (req, res) => {
-      try {
-            const {name,lastname,username,password}=req.body;
-            await User.findOnedAndUpdate(req.params.id,{name,lastname,username,password});
-            res.status(400).json('User updated');
-      } catch (error) {
-           res.json(error);
-      }
+  // console.log(password)
+  try {
+    const {name,lastname,username,role,password}=req.body.data;
+    let passwordEncrpry=bcrypt.hashSync(password,8);
+    await User.findByIdAndUpdate(req.params.id,{name,lastname,username,passwordEncrpry,role});
+    res.status(200).json('User updated');
+  } catch (error) {
+    res.json(error);
+  }
 }
 
 module.exports = UserController;

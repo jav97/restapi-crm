@@ -10,9 +10,9 @@ SessionController.ckeckAuth=async(req,res,next)=>{
         token = req.headers.authorization.split(' ')[1]
       }else{
         return res.json({
-                  success: false,
-                  message: 'Auth token is not supplied'
-                });
+          success: false,
+          message: 'Auth token is not supplied'
+        });
       }
       
      if (token) {
@@ -34,11 +34,12 @@ SessionController.ckeckAuth=async(req,res,next)=>{
         });
       }
 }
+
 SessionController.login = async (req, res) => {
   const { username, password } = req.body.data;
   const user = await User.findOne({ username: username });
-  console.log(user);
   if (user.username != "" && user.password != "") {
+    console.log(user.role)
     let bool = bcrypt.compareSync(password, user.password);
     if (bool) {
       let token = jwt.sign({ username: username },
@@ -49,7 +50,8 @@ SessionController.login = async (req, res) => {
       );
       res.json({
         mensaje: 'Autenticación correcta',
-        token: token
+        token: token,
+        role: user.role
       });
     } else if (bool == false) {
       res.json({ mensaje: "Contraseña incorrecta" })
@@ -59,9 +61,5 @@ SessionController.login = async (req, res) => {
   }
 }
 
-
-SessionController.logout=async(req,res)=>{
-   
-}
 
 module.exports=SessionController;

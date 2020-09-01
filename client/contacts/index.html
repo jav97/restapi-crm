@@ -46,10 +46,7 @@
                     <a class="btn btn-warning" href=""><i class="fas fa-user-cog"></i></a>
                 </li>
                 <li class="nav-item">
-                    <form action="" method="POST">
-                    
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-sign-out-alt"></i></button>
-                    </form>
+                    <button type="submit" id="logout" onclick="logout()" class="btn btn-primary"><i class="fas fa-sign-out-alt"></i></button>                 
                 </li>
             </ul>
         </div>
@@ -58,9 +55,14 @@
         <h1>Contacts</h1>
         <form>
             <div class="form-row">
+                <div hidden class="form-group col-md-4">
+                    <label for="">ID</label>
+                    <input type="text" id="_id" name="_id" class="form-control">
+                </div>
                 <div class="form-group col-md-4">
                     <label for="">Client</label>
-                    <select class="form-control" name="clients" id="clients">                        
+                    <select class="form-control" name="clients" id="clients">
+                        
                     </select>
                 </div>
                 <div class="form-group col-md-4">
@@ -88,7 +90,7 @@
                 <div class="form-group col-md-3">
                     <br>
                     <button class="btn btn-primary" id="btnSaveContact" type="button">Save</button>
-                    <button hidden class="btn btn-warning" id="btnUpdateContact" onclick="updateUser()" type="button">Update</button>
+                    <button hidden class="btn btn-warning" id="btnUpdateContact" type="button">Update</button>
                     <button class="btn btn-danger" id="cancel" type="button">Cancel</button>
                 </div>         
                 </div>         

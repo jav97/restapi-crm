@@ -23,3 +23,10 @@ function SessionStorageDB(name){
         }
     }
 }
+
+
+function logout(){
+    let sessionStorage = new SessionStorageDB('token');
+    sessionStorage.delete();
+    location.href = "/"
+}

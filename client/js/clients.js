@@ -25,6 +25,7 @@ function deleteClient(id) {
 $("#btnSaveClient").click(function () {
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
+
     var name = document.getElementById('name').value;
     var legalCertificate = document.getElementById('legalCertificate').value;
     var webSite = document.getElementById('webSite').value;
@@ -32,12 +33,15 @@ $("#btnSaveClient").click(function () {
     var numberPhone = document.getElementById('numberPhone').value;
     var sector = document.getElementById('sector').value;
 
-    axios.post('http://localhost:4000/api/clients', { 'name': name, 'legalCertificate': legalCertificate, 'webSite': webSite, 'address': address, 'numberPhone': numberPhone, 'sector': sector }, {
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Authorization': 'Bearer ' + token
-        },
-    })
+    if(name=="" ||legalCertificate=="" || webSite=="" || address=="" || numberPhone=="" || sector=="" ){
+        swal('Client data incomplete', "", "error");
+    }else{
+        axios.post('http://localhost:4000/api/clients', { 'name': name, 'legalCertificate': legalCertificate, 'webSite': webSite, 'address': address, 'numberPhone': numberPhone, 'sector': sector }, {
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': 'Bearer ' + token
+            },
+        })
         .then(function (res) {
             if (res.status == 201) {
                 swal('Client created correctly', "", "success");
@@ -48,6 +52,8 @@ $("#btnSaveClient").click(function () {
         .catch(function (err) {
             console.log(err);
         })
+    }
+    
 });
 
 window.onload = function () {
@@ -156,6 +162,8 @@ function getClient(id){
     .then(function (res) {
         if (res.status == 200) {
             data = (res.data);
+            console.log(data._id)
+            document.getElementById('_id').value = data._id;
             document.getElementById('name').value = data.name;
             document.getElementById('webSite').value = data.webSite;
             document.getElementById('legalCertificate').value = data.legalCertificate;
@@ -163,7 +171,6 @@ function getClient(id){
             document.getElementById('address').value = data.address;
             document.getElementById('sector').value = data.sector;
         }
-        console.log(res);
     })
     .catch(function (err) {
         console.log(err);
@@ -177,7 +184,6 @@ var editC = function (tbody, table) {
         getClient(dataTable._id);
         $('#btnUpdateClient').attr('hidden',false)
         $('#btnSaveClient').attr('hidden',true)
-        console.log(dataTable);
     });
 }
 
@@ -212,11 +218,43 @@ $("#cancel").click(function (){
     clearInput();
 });
 
+$('#btnUpdateClient').click(function(){
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];
+
+    var id = document.getElementById('_id').value;
+    var name = document.getElementById('name').value;
+    var legalCertificate = document.getElementById('legalCertificate').value;
+    var webSite = document.getElementById('webSite').value;
+    var address = document.getElementById('address').value;
+    var numberPhone = document.getElementById('numberPhone').value;
+    var sector = document.getElementById('sector').value;
+
+    var client ={'name': name, 'legalCertificate': legalCertificate, 'webSite': webSite, 'address': address, 'numberPhone': numberPhone, 'sector': sector };
+    axios.put(`http://localhost:4000/api/clients/${id}`,client,{
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function (res) {
+        if (res.status == 200) {
+            swal('User update correctly', "", "success");
+            data = res.data
+            clearInput();
+            drawTable();
+        }
+    })
+    .catch(function (err) {
+        console.log(err);
+    })
+});
+
 function clearInput(){
     document.getElementById('name').value = "";
     document.getElementById('legalCertificate').value = "";
     document.getElementById('webSite').value = "";
     document.getElementById('address').value = "";
     document.getElementById('numberPhone').value = "";
-    document.getElementById('sector').value = "";
+    document.getElementById('sector').value;
 }

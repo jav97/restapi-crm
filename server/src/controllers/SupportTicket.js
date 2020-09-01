@@ -64,13 +64,14 @@ SupportTicketController.deleteSupportTicket = async (req, res) => {
 
 //update date of some contact
 SupportTicketController.updateSupportTicket = async (req, res) => {
-      try {
-        const {titleProblem,detailProblem,whoReportProblem,state, client}=req.body;
-        await SupportTicket.findByIdAndUpdate(req.params.id,{titleProblem,detailProblem,whoReportProblem,state, client});
-        res.status(400).json('Support Ticket updated');
-      } catch (error) {
-           res.json(error);
-      }
+  try {
+    const client = await Client.findById(req.body.client);
+    const {titleProblem,detailProblem,whoReportProblem,state}=req.body;
+    await SupportTicket.findByIdAndUpdate(req.params.id,{client, titleProblem,detailProblem,whoReportProblem,state});
+   res.status(200).json('Support Ticket updated');
+  } catch (error) {
+    res.json(error);
+  }
 }
 
 module.exports = SupportTicketController;

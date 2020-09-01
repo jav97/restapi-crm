@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // routes
-app.use('/api/users',ckeckAuth, require('./routes/User'));
+app.use('/api/users', require('./routes/User'));
 app.use('/api/clients', ckeckAuth, require('./routes/Client'));
 app.use('/api/contacts', ckeckAuth, require('./routes/Contact'));
 app.use('/api/meetings', ckeckAuth, require('./routes/Meeting'));

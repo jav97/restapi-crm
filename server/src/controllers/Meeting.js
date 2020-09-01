@@ -69,9 +69,11 @@ MeetingController.deleteMeeting = async (req, res) => {
 //update date of some contact
 MeetingController.updateMeeting = async (req, res) => {
       try {
-        const {title, date, user, isVirtual, client}=req.body;
+        const user = await User.findById(req.body.user);
+        const client = await Client.findById(req.body.client);
+        const {title, date, isVirtual}=req.body;
         await Meeting.findByIdAndUpdate(req.params.id,{title, date, user, isVirtual, client});
-        res.status(400).json('Meeting updated');
+        res.status(200).json('Meeting updated');
       } catch (error) {
            res.json(error);
       }

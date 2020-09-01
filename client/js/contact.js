@@ -1,3 +1,8 @@
+window.onload = function(){
+    loadClients();
+    drawTable();
+}
+
 //delete contacts of the server
 function deleteClient(id) {
     let sessionStorage = new SessionStorageDB('token');
@@ -38,7 +43,6 @@ function deleteClient(id) {
 
 //save contact
 $("#btnSaveContact").click(function () {
-
     let sessionStorage = new SessionStorageDB('token');
     var token = sessionStorage.get()[0]['token'];
     
@@ -48,29 +52,29 @@ $("#btnSaveContact").click(function () {
     var email =       document.getElementById('email').value;
     var position =    document.getElementById('position').value;
     var numberPhone = document.getElementById('numberPhone').value;
- 
-    console.log(client);
-    axios.post('http://localhost:4000/api/contacts',{'name':name,'client':client,'lastname':lastname,'email':email,'numberPhone':numberPhone, 'position': position},{
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Authorization': 'Bearer ' + token
-        },
-    })
+    if(name =="" || client =="" || lastname =="" || email =="" || position=="" || numberPhone ==""){
+        swal('Contact data incomplete', "", "success");
+    }else{
+        axios.post('http://localhost:4000/api/contacts',{'name':name,'client':client,'lastname':lastname,'email':email,'numberPhone':numberPhone, 'position': position},{
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': 'Bearer ' + token
+            },
+        })
         .then(function (res) {
             if (res.status == 201) {
-                swal('Client created correctly', "", "success");
+                swal('Contact created correctly', "", "success");
                 drawTable();
+                clearInput();
             }
         })
         .catch(function (err) {
             console.log(err);
         })
+    }
+    
 });
 
-window.onload = function(){
-  loadClients();
-  drawTable();
-}
 
 function loadClients(){
     let sessionStorage = new SessionStorageDB('token');
@@ -190,39 +194,17 @@ var drawTable = function () {
         });
 }
 
-//get one contact for id
-function getContact(id){
-    let sessionStorage = new SessionStorageDB('token');
-    var token = sessionStorage.get()[0]['token'];
-
-    axios.get(`http://localhost:4000/api/contacts/${id}`, {
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Authorization': 'Bearer ' + token
-        },
-    })
-    .then(function (res) {
-        if (res.status == 200) {
-            data = (res.data);           
-            document.getElementById('name').value = data.name;
-            document.getElementById('clients').value = data.client;
-            document.getElementById('lastname').value = data.lastname;
-            document.getElementById('numberPhone').value = data.numberPhone;
-            document.getElementById('email').value = data.email;
-            document.getElementById('position').value = data.position;
-        }
-        console.log(res);
-    })
-    .catch(function (err) {
-        console.log(err);
-    })
-}
-
 //call getContact and charge data in the inputs to update
 var editC = function (tbody, table) {
     $(tbody).on("click", "button.edit", async function () {
         var dataTable = table.row($(this).parents("tr")).data();
-        getContact(dataTable._id);
+        document.getElementById('_id').value = dataTable._id;
+        document.getElementById('name').value = dataTable.name;
+        document.getElementById('clients').value = dataTable.client;
+        document.getElementById('lastname').value = dataTable.lastname;
+        document.getElementById('numberPhone').value = dataTable.numberPhone;
+        document.getElementById('email').value = dataTable.email;
+        document.getElementById('position').value = dataTable.position;
         $('#btnUpdateContact').attr('hidden',false)
         $('#btnSaveContact').attr('hidden',true)
     });
@@ -260,6 +242,39 @@ $("#cancel").click(function (){
     $('#btnSaveContact').attr('hidden',false)
     clearInput();
 });
+
+$("#btnUpdateContact").click(function (){
+    let sessionStorage = new SessionStorageDB('token');
+    var token = sessionStorage.get()[0]['token'];var name = document.getElementById('name').value;
+    
+    var id =        document.getElementById('_id').value;
+    var name =        document.getElementById('name').value;
+    var client =      document.getElementById('clients').value;
+    var lastname =    document.getElementById('lastname').value;
+    var email =       document.getElementById('email').value;
+    var position =    document.getElementById('position').value;
+    var numberPhone = document.getElementById('numberPhone').value;
+    var contact = {'name':name,'client':client,'lastname':lastname,'email':email,'numberPhone':numberPhone, 'position': position};
+    axios.put(`http://localhost:4000/api/contacts/${id}`,contact,{
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'Bearer ' + token
+        },
+    })
+    .then(function (res) {
+        if (res.status == 200) {
+            data = res.data
+            console.log(data);
+            swal('User update correctly', "", "success");
+            clearInput();
+            drawTable();
+        }
+    })
+    .catch(function (err) {
+        console.log(err);
+    })
+});
+
 
 function clearInput(){
     document.getElementById('name').value= "";

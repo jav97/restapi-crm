@@ -48,9 +48,7 @@
                     <a class="btn btn-warning" href=""><i class="fas fa-user-cog"></i></a>
                 </li>
                 <li class="nav-item">
-                    <form action="" method="POST">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-sign-out-alt"></i></button>
-                    </form>
+                    <button type="submit" id="logout" onclick="logout()" class="btn btn-primary"><i class="fas fa-sign-out-alt"></i></<button>                    
                 </li>
             </ul>
         </div>
@@ -61,6 +59,10 @@
         <!-- form to add user inline-->
         <form>
             <div class="form-row">
+                <div hidden class="form-group col-md-4">
+                    <label for="">ID</label>
+                    <input type="text" id="_id" name="_id" class="form-control">
+                </div>
                 <div class="form-group col-md-4">
                     <label for="">Name</label>
                     <input type="text" id="name" name="name" class="form-control">
@@ -97,7 +99,7 @@
                 <div class="form-group col-md-3">
                     <br>
                     <button class="btn btn-primary" id="btnSaveClient" type="button">Save</button>
-                    <button hidden class="btn btn-warning" id="btnUpdateClient" onclick="updateClient()" type="button">Update</button>
+                    <button hidden class="btn btn-warning" id="btnUpdateClient" type="button">Update</button>
                     <button class="btn btn-danger" id="cancel" type="button">Cancel</button>
                 </div> 
             </div>
